@@ -1,6 +1,27 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { CommonError } from "@/types/api";
 
-export default function Page() {
+export const dynamic = "force-dynamic";
+
+export default async function Page() {
+  const patientId = crypto.randomUUID();
+
+  const result = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/patients/${patientId}`,
+    {
+      method: "GET",
+      cache: "no-store",
+    }
+  );
+
+  if (!result.ok) {
+    const error = (await result.json()) as CommonError;
+    throw new Error(`[${error.error}] ${error.message}`);
+  }
+
+  const json = await result.json();
+  // console.log("result: ", json);
+
   return (
     <div className="flex min-h-svh p-6">
       <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
@@ -15,5 +36,5 @@ export default function Page() {
         </div>
       </div>
     </div>
-  )
+  );
 }
